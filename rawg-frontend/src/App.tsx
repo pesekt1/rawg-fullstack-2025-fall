@@ -7,7 +7,7 @@ function App() {
     <Grid
       templateAreas={{ base: `"nav" "main"`, lg: `"nav nav" "aside main"` }}
     >
-      <GridItem pl="2" bg="orange.300" area={"nav"}>
+      <GridItem pl="2" area={"nav"}>
         <NavBar />
       </GridItem>
       <Show above="lg">
