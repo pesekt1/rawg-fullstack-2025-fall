@@ -16,7 +16,7 @@ function App() {
     null,
   );
 
-  const handleSelectGenre = (genre: Genre) => {
+  const handleSelectGenre = (genre: Genre | null) => {
     setSelectedGenre(genre);
   };
 
