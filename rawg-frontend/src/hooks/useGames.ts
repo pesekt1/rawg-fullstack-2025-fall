@@ -1,5 +1,6 @@
 import useData from "./useData";
 import type { Genre } from "./useGenres";
+import type { Store } from "./useStores";
 
 export interface Platform {
   id: number;
@@ -18,6 +19,7 @@ export interface Game {
 const useGames = (
   selectedGenre: Genre | null,
   selectedPlatform: Platform | null,
+  selectedStore: Store | null,
 ) => {
   const { data, error, isLoading } = useData<Game>(
     "/games",
@@ -25,9 +27,10 @@ const useGames = (
       params: {
         genres: selectedGenre?.id,
         platforms: selectedPlatform?.id,
+        stores: selectedStore?.id,
       },
     },
-    [selectedGenre, selectedPlatform],
+    [selectedGenre, selectedPlatform, selectedStore],
   );
   return { games: data, error, isLoading };
 };
