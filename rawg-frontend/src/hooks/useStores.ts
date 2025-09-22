@@ -6,9 +6,6 @@ export interface Store {
   image_background: string;
 }
 
-const useStores = () => {
-  const { data, error, isLoading } = useData<Store>("/stores");
-  return { stores: data, error, isLoading };
-};
+const useStores = () => useData<Store>("/stores");
 
 export default useStores;
