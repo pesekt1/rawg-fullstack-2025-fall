@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   Button,
   HStack,
@@ -17,7 +19,14 @@ interface Props {
 }
 
 const GenreList = ({ onSelectGenre, selectedGenre }: Props) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const COLLAPSED_GENRE_COUNT = 5;
+
   const { genres, error, isLoading } = useGenres();
+
+  const displayedGenres = isExpanded
+    ? genres
+    : genres.slice(0, COLLAPSED_GENRE_COUNT);
 
   if (error) return null;
 
@@ -31,7 +40,7 @@ const GenreList = ({ onSelectGenre, selectedGenre }: Props) => {
         </Heading>
       </Button>
       <List>
-        {genres.map((genre) => (
+        {displayedGenres.map((genre) => (
           <ListItem key={genre.id} padding="5px">
             <HStack>
               <Image
@@ -53,6 +62,9 @@ const GenreList = ({ onSelectGenre, selectedGenre }: Props) => {
             </HStack>
           </ListItem>
         ))}
+        <Button onClick={() => setIsExpanded(!isExpanded)} marginY={5}>
+          {isExpanded ? "Show Less" : "Show More"}
+        </Button>
       </List>
     </>
   );
