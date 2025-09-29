@@ -9,7 +9,7 @@ export class Genre {
   @Column("varchar", { name: "name", length: 255 })
   name: string;
 
-  @Column("varchar", { name: "image_background", nullable: true, length: 45 })
+  @Column("varchar", { name: "image_background", nullable: true, length: 255 })
   image_background?: string;
 
   @ManyToMany(() => Game, (game) => game.genres)
