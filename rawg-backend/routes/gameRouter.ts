@@ -5,6 +5,7 @@ import { Genre } from "../entities/Genre";
 import { ParentPlatform } from "../entities/ParentPlatform";
 import { Store } from "../entities/Store";
 
+// interface for response data structure expected by the frontend
 interface ModifiedGame {
   id: number;
   name: string;
@@ -25,6 +26,7 @@ const gameRepository = AppDataSource.getRepository(Game);
 
 gameRouter.get("/", async (req, res) => {
   try {
+    // Using QueryBuilder to fetch games along with their relations - genres, stores, and parent platforms
     const queryBuilder = gameRepository
       .createQueryBuilder("game")
       .leftJoinAndSelect("game.genres", "genres")
@@ -32,16 +34,19 @@ gameRouter.get("/", async (req, res) => {
       .leftJoinAndSelect("game.parent_platforms", "parent_platforms");
 
     const games = await queryBuilder.getMany();
+
+    // Transforming the data to match the expected response structure
     const modifiedGames: ModifiedGame[] = games.map((game) => ({
       ...game,
       parent_platforms: game.parent_platforms?.map((pp) => ({ platform: pp })),
     }));
 
+    // Constructing the final response object
     const response: Response = {
       count: games.length,
       results: modifiedGames,
     };
-    res.send(response);
+    res.send(response); // Sending the response back to the client
   } catch (error) {
     console.error("Error fetching games:", error);
     res.status(500).send({ error: "Internal server error" });
