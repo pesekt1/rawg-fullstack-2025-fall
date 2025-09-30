@@ -88,7 +88,9 @@ async function insertData() {
 insertData()
   .then(() => {
     console.log("Data insertion completed.");
-    return AppDataSource.destroy();
+
+    AppDataSource.destroy(); // Close the data source connection
+    process.exit(); // Exit the process
   })
   .catch((error) => {
     console.error("Error during data insertion:", error);
