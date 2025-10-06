@@ -2,20 +2,11 @@ import { Router } from "express";
 import { SelectQueryBuilder } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { Game } from "../entities/Game";
-import { Genre } from "../entities/Genre";
 import { ParentPlatform } from "../entities/ParentPlatform";
-import { Store } from "../entities/Store";
 
-// interface for response data structure expected by the frontend
-interface ModifiedGame {
-  id: number;
-  name: string;
-  background_image?: string;
-  metacritic?: number;
+type ModifiedGame = Omit<Game, "parent_platforms"> & {
   parent_platforms: { platform: ParentPlatform }[];
-  genres: Genre[];
-  stores: Store[];
-}
+};
 
 interface Response {
   count: number;
@@ -97,12 +88,26 @@ const addParentPlatformFilter = (
   }
 };
 
+const addOrdering = (
+  queryBuilder: SelectQueryBuilder<Game>,
+  ordering: string | undefined
+) => {
+  //TODO: implement proper relevance ordering
+  if (!ordering) queryBuilder.orderBy("game.rating", "DESC"); //default relevance ordering
+  if (ordering === "-added") queryBuilder.orderBy("game.added", "DESC");
+  if (ordering === "name") queryBuilder.orderBy("game.name", "ASC");
+  if (ordering === "-released") queryBuilder.orderBy("game.released", "DESC");
+  if (ordering === "metacritic")
+    queryBuilder.orderBy("game.metacritic", "DESC");
+  if (ordering === "-rating") queryBuilder.orderBy("game.rating", "DESC");
+};
 gameRouter.get("/", async (req, res) => {
   const genreId = req.query.genres ? Number(req.query.genres) : undefined;
   const storeId = req.query.stores ? Number(req.query.stores) : undefined;
   const parentPlatformId = req.query.platforms
     ? Number(req.query.platforms)
     : undefined;
+  const ordering = req.query.ordering ? String(req.query.ordering) : undefined;
   try {
     // Using QueryBuilder to fetch games along with their relations - genres, stores, and parent platforms
     const queryBuilder = gameRepository
@@ -114,6 +119,7 @@ gameRouter.get("/", async (req, res) => {
     addGenreFilter(queryBuilder, genreId);
     addStoreFilter(queryBuilder, storeId);
     addParentPlatformFilter(queryBuilder, parentPlatformId);
+    addOrdering(queryBuilder, ordering);
 
     const games = await queryBuilder.getMany();
 
