@@ -23,6 +23,15 @@ export class Game {
   @Column("varchar", { name: "background_image", nullable: true, length: 255 })
   background_image?: string;
 
+  @Column({ nullable: true })
+  released?: string;
+
+  @Column("float", { nullable: true, precision: 12 })
+  rating?: number;
+
+  @Column({ nullable: true })
+  added?: number;
+
   @ManyToMany(() => Genre, (genre) => genre.games)
   @JoinTable({
     name: "games_has_genres",
