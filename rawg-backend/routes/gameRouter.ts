@@ -15,7 +15,7 @@ interface Response {
 const gameRouter = Router();
 
 gameRouter.get("/", async (req, res) => {
-  const games = await getGames(req);
+  const games = await getGames(req); // Fetching games using the service layer
 
   // Constructing the final response object
   const response: Response = {
