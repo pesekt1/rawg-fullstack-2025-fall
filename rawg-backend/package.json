@@ -6,8 +6,10 @@
   "author": "",
   "license": "ISC",
   "scripts": {
+    "build": "npm install && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --legacy-watch --exec ts-node --transpile-only index.ts"
+    "start": "nodemon --legacy-watch --exec ts-node --transpile-only index.ts",
+    "start-prod": "node dist/index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
