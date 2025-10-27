@@ -1,0 +1,58 @@
+# run without the seeder
+# docker-compose up --scale seeder=0
+services:
+  rawg-backend:
+    container_name: rawg-backend
+    build:
+      context: ./rawg-backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./rawg-backend:/app
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: mysql://root:rootpassword@mysql:3306/rawgDatabase
+    depends_on:
+      - mysql
+
+  rawg-frontend:
+    container_name: rawg-frontend
+    build:
+      context: ./rawg-frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./rawg-frontend:/app
+      - /app/node_modules # Prevents overwriting node_modules on the container
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_URL: http://localhost:5000
+      CHOKIDAR_USEPOLLING: true # For file watching in Docker on some systems
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: rawgDatabase
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data_rawg:/var/lib/mysql
+
+  seeder:
+    container_name: seeder
+    build:
+      context: ./seeder
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: mysql://root:rootpassword@mysql:3306/rawgDatabase
+    volumes:
+      - ./seeder:/app
+
+volumes:
+  mysql-data_rawg:
+# if there are problems, remove it: 
+# docker volume rm rawg-fullstack-2025-fall_mysql-data_rawg

@@ -6,11 +6,7 @@ import { Store } from "./entities/Store";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
-  host: "localhost",
-  port: 3307,
-  username: "root",
-  password: "123456",
-  database: "rawgDatabase",
+  url: process.env.DATABASE_URL,
   entities: [Game, Genre, ParentPlatform, Store],
   synchronize: true,
   logging: true,
