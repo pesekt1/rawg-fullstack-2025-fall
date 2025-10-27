@@ -11,10 +11,10 @@ services:
     ports:
       - "5000:5000"
     environment:
-      DATABASE_URL: mysql://root:rootpassword@mysql:3306/rawgDatabase
-      DB_TYPE: mysql
+      DATABASE_URL: postgres://root:rootpassword@postgres:5432/rawgDatabase
+      DB_TYPE: postgres
     depends_on:
-      - mysql
+      - postgres
 
   rawg-frontend:
     container_name: rawg-frontend
@@ -30,31 +30,32 @@ services:
       VITE_API_URL: http://localhost:5000
       CHOKIDAR_USEPOLLING: true # For file watching in Docker on some systems
 
-  mysql:
-    image: mysql:latest
-    container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: rawgDatabase
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql-data_rawg:/var/lib/mysql
-
   seeder:
     container_name: seeder
     build:
       context: ./seeder
       dockerfile: Dockerfile
     depends_on:
-      - mysql
+      - postgres
     environment:
-      DATABASE_URL: mysql://root:rootpassword@mysql:3306/rawgDatabase
-      DB_TYPE: mysql
+      DATABASE_URL: postgres://root:rootpassword@postgres:5432/rawgDatabase
+      DB_TYPE: postgres
     volumes:
       - ./seeder:/app
 
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: rawgDatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data_rawg:/var/lib/postgresql/data
+
 volumes:
-  mysql-data_rawg:
+  postgres-data_rawg:
 # if there are problems, remove it: 
-# docker volume rm rawg-fullstack-2025-fall_mysql-data_rawg
+# docker volume rm rawg-fullstack-2025-fall_postgres-data_rawg

@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Game } from "./Game";
 
-@Entity("parent_platforms", { schema: "rawgDatabase" })
+@Entity("parent_platforms")
 export class ParentPlatform {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;

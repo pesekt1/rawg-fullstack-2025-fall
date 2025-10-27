@@ -9,7 +9,7 @@ import { Genre } from "./Genre";
 import { ParentPlatform } from "./ParentPlatform";
 import { Store } from "./Store";
 
-@Entity("games", { schema: "rawgDatabase" })
+@Entity("games")
 export class Game {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
@@ -26,7 +26,7 @@ export class Game {
   @Column({ nullable: true })
   released?: string;
 
-  @Column("float", { nullable: true, precision: 12 })
+  @Column("float", { nullable: true })
   rating?: number;
 
   @Column({ nullable: true })
@@ -37,7 +37,6 @@ export class Game {
     name: "games_has_genres",
     joinColumns: [{ name: "games_id", referencedColumnName: "id" }],
     inverseJoinColumns: [{ name: "genres_id", referencedColumnName: "id" }],
-    schema: "rawgDatabase",
   })
   genres: Genre[];
 
@@ -48,7 +47,6 @@ export class Game {
     inverseJoinColumns: [
       { name: "parent_platforms_id", referencedColumnName: "id" },
     ],
-    schema: "rawgDatabase",
   })
   parent_platforms: ParentPlatform[];
 
@@ -57,7 +55,6 @@ export class Game {
     name: "games_has_stores",
     joinColumns: [{ name: "games_id", referencedColumnName: "id" }],
     inverseJoinColumns: [{ name: "stores_id", referencedColumnName: "id" }],
-    schema: "rawgDatabase",
   })
   stores: Store[];
 }

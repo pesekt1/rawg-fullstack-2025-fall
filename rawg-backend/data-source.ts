@@ -5,7 +5,7 @@ import { ParentPlatform } from "./entities/ParentPlatform";
 import { Store } from "./entities/Store";
 
 export const AppDataSource = new DataSource({
-  type: "mysql",
+  type: process.env.DB_TYPE as "mysql" | "postgres",
   url: process.env.DATABASE_URL,
   entities: [Game, Genre, ParentPlatform, Store],
   synchronize: true,
