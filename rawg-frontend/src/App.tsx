@@ -19,6 +19,7 @@ export interface GameQuery {
   store: Store | null;
   sortOrder: string | null;
   searchText: string | null;
+  pageSize: number | null;
 }
 
 function App() {
