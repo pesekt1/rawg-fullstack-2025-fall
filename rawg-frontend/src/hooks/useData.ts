@@ -4,7 +4,7 @@ import { type AxiosRequestConfig, CanceledError } from "axios";
 
 import apiClient from "../services/api-client";
 
-interface Response<T> {
+export interface Response<T> {
   count: number;
   results: T[];
 }
