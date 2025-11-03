@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import type { UseQueryResult } from "@tanstack/react-query";
 
-import type { Response } from "../../hooks/useData";
+import type { Response } from "../../services/api-client";
 import getCroppedImageUrl from "../../services/image-url";
 
 interface Item {
