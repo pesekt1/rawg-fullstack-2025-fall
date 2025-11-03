@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import type { GameQuery } from "../App";
-import apiClient, { type Response } from "../services/api-client";
+import ApiClient, { type Response } from "../services/api-client";
 
 export interface Platform {
   id: number;
@@ -17,21 +17,23 @@ export interface Game {
   parent_platforms: { platform: Platform }[];
 }
 
-const useGames = (gameQuery: GameQuery) =>
-  useQuery<Response<Game>, Error>({
+const apiClient = new ApiClient<Game>("/games");
+
+const useGames = (gameQuery: GameQuery) => {
+  const axiosConfig = {
+    params: {
+      genres: gameQuery.genre?.id,
+      platforms: gameQuery.platform?.id,
+      stores: gameQuery.store?.id,
+      ordering: gameQuery.sortOrder,
+      search: gameQuery.searchText,
+    },
+  };
+
+  return useQuery<Response<Game>, Error>({
     queryKey: ["games", gameQuery],
-    queryFn: () =>
-      apiClient
-        .get<Response<Game>>("/games", {
-          params: {
-            genres: gameQuery.genre?.id,
-            platforms: gameQuery.platform?.id,
-            stores: gameQuery.store?.id,
-            ordering: gameQuery.sortOrder,
-            search: gameQuery.searchText,
-          },
-        })
-        .then((res) => res.data),
+    queryFn: () => apiClient.getAll(axiosConfig),
   });
+};
 
 export default useGames;
