@@ -1,7 +1,12 @@
 import { SelectQueryBuilder } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { Game } from "../entities/Game";
-import { ModifiedGame } from "../routes/gameRouter";
+import {
+  DEFAULT_PAGE_SIZE,
+  MAX_PAGE_SIZE,
+  ModifiedGame,
+  START_PAGE,
+} from "../routes/gameRouter";
 
 const gameRepository = AppDataSource.getRepository(Game);
 
@@ -102,14 +107,7 @@ const addSearch = (
   }
 };
 
-const modifyGameResponse = (games: Game[]): ModifiedGame[] => {
-  return games.map((game) => ({
-    ...game,
-    parent_platforms: game.parent_platforms?.map((pp) => ({ platform: pp })),
-  }));
-};
-
-export const getGames = async (req: any) => {
+const buildGameQuery = (req: any) => {
   const genreId = req.query.genres ? Number(req.query.genres) : undefined;
   const storeId = req.query.stores ? Number(req.query.stores) : undefined;
   const parentPlatformId = req.query.platforms
@@ -117,24 +115,50 @@ export const getGames = async (req: any) => {
     : undefined;
   const ordering = req.query.ordering ? String(req.query.ordering) : undefined;
   const search = req.query.search ? String(req.query.search) : undefined;
+
+  const queryBuilder = gameRepository
+    .createQueryBuilder("game")
+    .leftJoinAndSelect("game.genres", "genres")
+    .leftJoinAndSelect("game.stores", "stores")
+    .leftJoinAndSelect("game.parent_platforms", "parent_platforms");
+
+  addGenreFilter(queryBuilder, genreId);
+  addStoreFilter(queryBuilder, storeId);
+  addParentPlatformFilter(queryBuilder, parentPlatformId);
+  addOrdering(queryBuilder, ordering);
+  addSearch(queryBuilder, search);
+
+  return queryBuilder;
+};
+
+const modifyGames = (games: Game[]): ModifiedGame[] => {
+  return games.map((game) => ({
+    ...game,
+    parent_platforms: game.parent_platforms?.map((pp) => ({ platform: pp })),
+  }));
+};
+
+export const getGames = async (req: any) => {
+  const page = req.query.page ? Number(req.query.page) : START_PAGE;
+  let pageSize = req.query.page_size
+    ? Number(req.query.page_size)
+    : DEFAULT_PAGE_SIZE;
+
+  if (pageSize > MAX_PAGE_SIZE) {
+    pageSize = MAX_PAGE_SIZE;
+  }
+
+  const queryBuilder = buildGameQuery(req);
+
   try {
-    // Using QueryBuilder to fetch games along with their relations - genres, stores, and parent platforms
-    const queryBuilder = gameRepository
-      .createQueryBuilder("game")
-      .leftJoinAndSelect("game.genres", "genres")
-      .leftJoinAndSelect("game.stores", "stores")
-      .leftJoinAndSelect("game.parent_platforms", "parent_platforms");
+    queryBuilder.skip((page - 1) * pageSize).take(pageSize);
 
-    addGenreFilter(queryBuilder, genreId);
-    addStoreFilter(queryBuilder, storeId);
-    addParentPlatformFilter(queryBuilder, parentPlatformId);
-    addOrdering(queryBuilder, ordering);
-    addSearch(queryBuilder, search);
-
-    const games = await queryBuilder.getMany();
-    return modifyGameResponse(games);
+    const [games, total] = await queryBuilder.getManyAndCount();
+    const modifiedGames = modifyGames(games);
+    return { modifiedGames, total };
   } catch (error) {
     console.error("Error fetching games:", error);
-    throw new Error("Error fetching games");
+    // Always return a valid object, even on error
+    return { modifiedGames: [], total: 0 };
   }
 };

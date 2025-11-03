@@ -13,6 +13,7 @@ services:
     environment:
       DATABASE_URL: mysql://root:rootpassword@mysql:3306/rawgDatabase
       DB_TYPE: mysql
+      SERVER_URL: http://localhost:5000
     depends_on:
       - mysql
 
