@@ -1,16 +1,14 @@
 import useStores from "../hooks/useStores";
-import type { Store } from "../services/storeService";
+import useGameQueryStore from "../store";
 import CustomList from "./reusableComponents/CustomList";
 
-interface Props {
-  onSelectStore: (store: Store | null) => void;
-  selectedStore: Store | null;
-}
+const selectedStore = useGameQueryStore((s) => s.gameQuery.store);
+const setStore = useGameQueryStore((s) => s.setStore);
 
-const StoreList = ({ onSelectStore, selectedStore }: Props) => {
+const StoreList = () => {
   return (
     <CustomList
-      onSelectItem={onSelectStore}
+      onSelectItem={setStore}
       selectedItem={selectedStore}
       title="Stores"
       useDataHook={useStores}

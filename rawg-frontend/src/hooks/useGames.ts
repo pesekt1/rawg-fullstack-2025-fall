@@ -1,11 +1,13 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-import type { GameQuery } from "../App";
 import { type Response } from "../services/api-client";
 import type { Game } from "../services/gameService";
 import gameService from "../services/gameService";
+import useGameQueryStore from "../store";
 
-const useGames = (gameQuery: GameQuery) => {
+const useGames = () => {
+  const gameQuery = useGameQueryStore((s) => s.gameQuery);
+
   const simpleGameQuery = {
     ...gameQuery,
     genre: gameQuery.genre?.id,

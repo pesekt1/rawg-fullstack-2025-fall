@@ -21,8 +21,8 @@ interface Item {
 }
 
 interface Props<T> {
-  onSelectItem: (item: T | null) => void;
-  selectedItem: T | null;
+  onSelectItem: (item?: T) => void;
+  selectedItem?: T;
   title: string;
   useDataHook: () => UseQueryResult<Response<T>, Error>;
 }
@@ -50,7 +50,7 @@ const CustomList = <T extends Item>({
 
   return (
     <>
-      <Button variant="link" onClick={() => onSelectItem(null)}>
+      <Button variant="link" onClick={() => onSelectItem(undefined)}>
         <Heading fontSize="2xl" marginBottom={3}>
           {title}
         </Heading>
