@@ -51,7 +51,7 @@ async function insertData() {
   await storeRepo.delete({});
   console.log("stores deleted");
 
-  async function generateDescription(id: number): Promise<string> {
+  const fetchDescription = async (id: number): Promise<string> => {
     const apiKey = process.env.RAWG_API_KEY;
     try {
       const response = await axios.get(
@@ -62,7 +62,7 @@ async function insertData() {
       console.error(`Failed to fetch description for game ID ${id}:`, error);
       return "";
     }
-  }
+  };
 
   //loop through each game and ensure related entities exist before saving the game
   for (const game of gamesData) {
@@ -116,7 +116,7 @@ async function insertData() {
     );
 
     // Generate and set the description_raw field
-    game.description_raw = await generateDescription(game.id);
+    game.description_raw = await fetchDescription(game.id);
 
     // Now save the game itself - it will also save the relationships in the join tables
     await gameRepo.save(game);
