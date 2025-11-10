@@ -9,9 +9,9 @@ import { NavBar } from "./components/NavBar";
 import PlatformSelector from "./components/PlatformSelector";
 import SortSelector from "./components/SortSelector";
 import StoreList from "./components/StoreList";
-import type { Platform } from "./hooks/useGames";
-import type { Genre } from "./hooks/useGenres";
-import type { Store } from "./hooks/useStores";
+import type { Genre } from "./services/genreService";
+import type { Platform } from "./services/platformService";
+import type { Store } from "./services/storeService";
 
 export interface GameQuery {
   genre: Genre | null;

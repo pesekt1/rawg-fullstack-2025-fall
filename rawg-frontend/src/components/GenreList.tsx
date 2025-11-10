@@ -1,4 +1,5 @@
-import useGenres, { type Genre } from "../hooks/useGenres";
+import useGenres from "../hooks/useGenres";
+import { type Genre } from "../services/genreService";
 import CustomList from "./reusableComponents/CustomList";
 
 interface Props {

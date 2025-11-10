@@ -1,5 +1,5 @@
-import type { Store } from "../hooks/useStores";
 import useStores from "../hooks/useStores";
+import type { Store } from "../services/storeService";
 import CustomList from "./reusableComponents/CustomList";
 
 interface Props {
