@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { Game } from "../entities/Game";
 import { ParentPlatform } from "../entities/ParentPlatform";
-import { deleteGameById, getGames } from "../services/gameService";
+import { deleteGameById, getGame, getGames } from "../services/gameService";
 
 export type ModifiedGame = Omit<Game, "parent_platforms"> & {
   parent_platforms: { platform: ParentPlatform }[];
@@ -54,6 +54,20 @@ gameRouter.get("/", async (req, res) => {
   // Constructing the final response object
   const response: Response = buildGamesResponse(modifiedGames, total, req);
   res.send(response); // Sending the response back to the client
+});
+
+gameRouter.get("/:id", async (req, res) => {
+  const gameId = req.params.id;
+  try {
+    const game = await getGame(gameId);
+    if (game) {
+      res.send(game);
+    } else {
+      res.status(404).send({ error: "Game not found." });
+    }
+  } catch (error) {
+    res.status(500).send({ error: "Failed to fetch the game." });
+  }
 });
 
 gameRouter.delete("/:id", async (req, res) => {

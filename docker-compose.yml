@@ -49,9 +49,8 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - mysql
-    environment:
-      DATABASE_URL: mysql://root:rootpassword@mysql:3306/rawgDatabase
-      DB_TYPE: mysql
+    env_file:
+      - ./seeder/.env
     volumes:
       - ./seeder:/app
 

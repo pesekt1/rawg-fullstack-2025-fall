@@ -32,6 +32,9 @@ export class Game {
   @Column({ nullable: true })
   added?: number;
 
+  @Column({ type: "text", nullable: true })
+  description_raw?: string;
+
   @ManyToMany(() => Genre, (genre) => genre.games)
   @JoinTable({
     name: "games_has_genres",

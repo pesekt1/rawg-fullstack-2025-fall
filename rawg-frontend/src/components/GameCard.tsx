@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import {
   Button,
   Card,
@@ -30,7 +32,9 @@ export const GameCard = ({ game }: Props) => {
         <CriticScore score={game.metacritic} />
       </HStack>
       <CardBody>
-        <Heading fontSize="2xl">{game.name}</Heading>
+        <Heading fontSize="2xl">
+          <Link to={`/games/${game.id}`}>{game.name}</Link>
+        </Heading>
         <Button
           isLoading={isLoading}
           color="red"

@@ -1,9 +1,13 @@
+import axios from "axios";
+import dotenv from "dotenv";
 import * as fs from "fs";
 import { AppDataSource } from "./data-source";
 import { Game } from "./entities/Game";
 import { Genre } from "./entities/Genre";
 import { ParentPlatform } from "./entities/ParentPlatform";
 import { Store } from "./entities/Store";
+
+dotenv.config();
 
 // Define the structure of the original game data as it appears in games.json
 interface GameOriginal {
@@ -46,6 +50,19 @@ async function insertData() {
   console.log("parent platforms deleted");
   await storeRepo.delete({});
   console.log("stores deleted");
+
+  async function generateDescription(id: number): Promise<string> {
+    const apiKey = process.env.RAWG_API_KEY;
+    try {
+      const response = await axios.get(
+        `https://api.rawg.io/api/games/${id}?key=${apiKey}`
+      );
+      return response.data.description_raw || "No description available.";
+    } catch (error) {
+      console.error(`Failed to fetch description for game ID ${id}:`, error);
+      return "";
+    }
+  }
 
   //loop through each game and ensure related entities exist before saving the game
   for (const game of gamesData) {
@@ -97,6 +114,9 @@ async function insertData() {
     game.stores = Array.from(
       new Map(game.stores.map((s) => [s.id, s])).values()
     );
+
+    // Generate and set the description_raw field
+    game.description_raw = await generateDescription(game.id);
 
     // Now save the game itself - it will also save the relationships in the join tables
     await gameRepo.save(game);

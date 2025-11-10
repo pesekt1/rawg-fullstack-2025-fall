@@ -163,6 +163,18 @@ export const getGames = async (req: any) => {
   }
 };
 
+export const getGame = async (gameId: string) => {
+  try {
+    const game = await gameRepository.findOne({
+      where: { id: Number(gameId) },
+      relations: ["genres", "stores", "parent_platforms"],
+    });
+    return game;
+  } catch (error) {
+    throw new Error(`Game with ID ${gameId} not found.`);
+  }
+};
+
 export const deleteGameById = async (gameId: number) => {
   try {
     await gameRepository.delete(gameId);
