@@ -47,7 +47,7 @@ const useGameQueryStore = create<GameQueryStore>((set) => ({
 
   setSearchText: (searchText) =>
     set(() => ({
-      gameQuery: { searchText },
+      gameQuery: { searchText }, //reset other filters when searching
     })),
 }));
 export default useGameQueryStore;
