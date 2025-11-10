@@ -169,7 +169,12 @@ export const getGame = async (gameId: string) => {
       where: { id: Number(gameId) },
       relations: ["genres", "stores", "parent_platforms"],
     });
-    return game;
+    return {
+      ...game,
+      parent_platforms: game?.parent_platforms?.map((parent_platform) => ({
+        platform: parent_platform,
+      })),
+    };
   } catch (error) {
     throw new Error(`Game with ID ${gameId} not found.`);
   }
