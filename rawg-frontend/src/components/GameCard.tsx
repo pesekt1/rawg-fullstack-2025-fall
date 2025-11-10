@@ -1,5 +1,13 @@
-import { Card, CardBody, Heading, HStack, Image } from "@chakra-ui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  HStack,
+  Heading,
+  Image,
+} from "@chakra-ui/react";
 
+import useDeleteGame from "../hooks/useDeleteGame";
 import type { Game } from "../hooks/useGames";
 import getCroppedImageUrl from "../services/image-url";
 import CriticScore from "./CriticScore";
@@ -10,6 +18,8 @@ interface Props {
 }
 
 export const GameCard = ({ game }: Props) => {
+  const { mutate, isLoading } = useDeleteGame();
+
   return (
     <Card>
       <Image src={getCroppedImageUrl(game.background_image)} alt={game.name} />
@@ -21,6 +31,13 @@ export const GameCard = ({ game }: Props) => {
       </HStack>
       <CardBody>
         <Heading fontSize="2xl">{game.name}</Heading>
+        <Button
+          isLoading={isLoading}
+          color="red"
+          onClick={() => mutate(game.id)}
+        >
+          Delete
+        </Button>
       </CardBody>
     </Card>
   );

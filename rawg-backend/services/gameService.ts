@@ -162,3 +162,11 @@ export const getGames = async (req: any) => {
     return { modifiedGames: [], total: 0 };
   }
 };
+
+export const deleteGameById = async (gameId: number) => {
+  try {
+    await gameRepository.delete(gameId);
+  } catch (error) {
+    throw new Error(`Failed to delete game with ID ${gameId}.`);
+  }
+};
