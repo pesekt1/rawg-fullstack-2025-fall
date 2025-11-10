@@ -4,8 +4,8 @@ import gameService from "../services/gameService";
 
 const useGame = (id: string) =>
   useQuery({
-    queryKey: ["game", id],
-    queryFn: () => gameService.getById(Number(id)),
+    queryKey: ["games", id],
+    queryFn: () => gameService.get(id),
   });
 
 export default useGame;
