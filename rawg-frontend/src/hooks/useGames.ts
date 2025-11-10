@@ -20,8 +20,15 @@ export interface Game {
 const apiClient = new ApiClient<Game>("/games");
 
 const useGames = (gameQuery: GameQuery) => {
+  const simpleGameQuery = {
+    ...gameQuery,
+    genre: gameQuery.genre?.id,
+    platform: gameQuery.platform?.id,
+    store: gameQuery.store?.id,
+  };
+
   return useInfiniteQuery<Response<Game>, Error>({
-    queryKey: ["games", gameQuery],
+    queryKey: ["games", simpleGameQuery],
     queryFn: ({ pageParam = 1 }) =>
       apiClient.getAll({
         params: {
