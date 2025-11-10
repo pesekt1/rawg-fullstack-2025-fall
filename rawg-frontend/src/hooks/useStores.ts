@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import ms from "ms";
 
 import stores from "../data/stores";
 import ApiClient, { type Response } from "../services/api-client";
@@ -16,8 +17,8 @@ const useStores = () =>
     queryKey: ["stores"],
     queryFn: apiClient.getAll,
     initialData: stores,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
-    cacheTime: 1000 * 60 * 60, // 1 hour
+    staleTime: ms("24 hours"), // 24 hours
+    cacheTime: ms("24 hours"), // 24 hours
   });
 
 export default useStores;
