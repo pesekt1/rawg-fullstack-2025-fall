@@ -38,9 +38,8 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
-    environment:
-      DATABASE_URL: postgres://root:rootpassword@postgres:5432/rawgDatabase
-      DB_TYPE: postgres
+    env_file:
+      - ./seeder/.env-postgres
     volumes:
       - ./seeder:/app
 
