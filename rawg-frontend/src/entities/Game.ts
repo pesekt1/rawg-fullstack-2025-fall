@@ -1,4 +1,7 @@
+import type { Genre } from "./Genre";
 import type { Platform } from "./Platform";
+import type { Publisher } from "./Publisher";
+import type { Store } from "./Store";
 
 export interface Game {
   id: number;
@@ -7,4 +10,7 @@ export interface Game {
   metacritic: number;
   description_raw: string;
   parent_platforms: { platform: Platform }[];
+  genres: Genre[];
+  publishers: Publisher[];
+  stores: Store[];
 }
