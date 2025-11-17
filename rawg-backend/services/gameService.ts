@@ -167,7 +167,7 @@ export const getGame = async (gameId: string) => {
   try {
     const game = await gameRepository.findOne({
       where: { id: Number(gameId) },
-      relations: ["genres", "stores", "parent_platforms"],
+      relations: ["genres", "stores", "parent_platforms", "publishers"],
     });
     return {
       ...game,
