@@ -5,6 +5,7 @@ import { AppDataSource } from "./data-source";
 import { Game } from "./entities/Game";
 import { Genre } from "./entities/Genre";
 import { ParentPlatform } from "./entities/ParentPlatform";
+import { Publisher } from "./entities/Publisher";
 import { Store } from "./entities/Store";
 
 dotenv.config();
@@ -18,6 +19,7 @@ interface GameOriginal {
   parent_platforms: { platform: ParentPlatform }[];
   genres: Genre[];
   stores: { store: Store }[];
+  publishers: Publisher[];
 }
 
 async function insertData() {
@@ -40,6 +42,7 @@ async function insertData() {
   const genreRepo = AppDataSource.getRepository(Genre);
   const parentPlatformRepo = AppDataSource.getRepository(ParentPlatform);
   const storeRepo = AppDataSource.getRepository(Store);
+  const publisherRepo = AppDataSource.getRepository(Publisher);
 
   //before inserting data, delete all existing data to avoid duplicates:
   await gameRepo.delete({});
@@ -50,22 +53,39 @@ async function insertData() {
   console.log("parent platforms deleted");
   await storeRepo.delete({});
   console.log("stores deleted");
+  await publisherRepo.delete({});
+  console.log("publishers deleted");
 
-  const fetchDescription = async (id: number): Promise<string> => {
+  async function getAdditionalGameData(id: number) {
     const apiKey = process.env.RAWG_API_KEY;
     try {
       const response = await axios.get(
         `https://api.rawg.io/api/games/${id}?key=${apiKey}`
       );
-      return response.data.description_raw || "No description available.";
+
+      const description_raw: string = response.data.description_raw || "";
+      const publishers: Publisher[] = response.data.publishers || [];
+
+      return {
+        description_raw,
+        publishers,
+      };
     } catch (error) {
       console.error(`Failed to fetch description for game ID ${id}:`, error);
-      return "";
+      return { description_raw: "", publishers: [] };
     }
-  };
+  }
 
   //loop through each game and ensure related entities exist before saving the game
   for (const game of gamesData) {
+    // Fetch additional data for the game
+    const { description_raw, publishers } = await getAdditionalGameData(
+      game.id
+    );
+
+    game.description_raw = description_raw;
+    game.publishers = publishers || [];
+
     // Ensure related genres exist in the database, if not, create them
     game.genres = await Promise.all(
       game.genres.map(async (g) => {
@@ -75,6 +95,20 @@ async function insertData() {
           console.log(`Genre: ${g.name} created`);
         }
         return genre;
+      })
+    );
+
+    //Ensure related publishers exist in the database, if not, create them
+    game.publishers = await Promise.all(
+      game.publishers.map(async (p) => {
+        let publisher = await publisherRepo.findOne({
+          where: { name: p.name },
+        });
+        if (!publisher) {
+          publisher = await publisherRepo.save(p);
+          console.log(`Publisher: ${p.name} created`);
+        }
+        return publisher;
       })
     );
 
@@ -114,9 +148,6 @@ async function insertData() {
     game.stores = Array.from(
       new Map(game.stores.map((s) => [s.id, s])).values()
     );
-
-    // Generate and set the description_raw field
-    game.description_raw = await fetchDescription(game.id);
 
     // Now save the game itself - it will also save the relationships in the join tables
     await gameRepo.save(game);

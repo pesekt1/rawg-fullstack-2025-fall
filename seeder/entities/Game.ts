@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { Genre } from "./Genre";
 import { ParentPlatform } from "./ParentPlatform";
+import { Publisher } from "./Publisher";
 import { Store } from "./Store";
 
 @Entity("games")
@@ -60,4 +61,12 @@ export class Game {
     inverseJoinColumns: [{ name: "stores_id", referencedColumnName: "id" }],
   })
   stores: Store[];
+
+  @ManyToMany(() => Publisher, (publisher) => publisher.games)
+  @JoinTable({
+    name: "games_has_publishers",
+    joinColumns: [{ name: "games_id", referencedColumnName: "id" }],
+    inverseJoinColumns: [{ name: "publishers_id", referencedColumnName: "id" }],
+  })
+  publishers: Publisher[];
 }
