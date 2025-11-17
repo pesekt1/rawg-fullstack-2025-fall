@@ -193,6 +193,22 @@ export const getTrailers = async (gameId: number) => {
   return game.trailers;
 };
 
+export const getScreenshots = async (gameId: number) => {
+  const game = await gameRepository
+    .createQueryBuilder("game")
+    .leftJoinAndSelect("game.screenshots", "screenshots")
+    .where("game.id = :gameId", { gameId })
+    .getOne();
+
+  if (!game || !game.screenshots) {
+    throw new Error(`No screenshots found for game with ID ${gameId}.`);
+  }
+  return {
+    count: game.screenshots.length,
+    results: game.screenshots,
+  };
+};
+
 export const deleteGameById = async (gameId: number) => {
   try {
     await gameRepository.delete(gameId);

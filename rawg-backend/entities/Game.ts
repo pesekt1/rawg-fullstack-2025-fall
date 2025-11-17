@@ -9,6 +9,7 @@ import {
 import { Genre } from "./Genre";
 import { ParentPlatform } from "./ParentPlatform";
 import { Publisher } from "./Publisher";
+import { Screenshot } from "./Screenshot";
 import { Store } from "./Store";
 import { Trailer } from "./Trailer";
 
@@ -74,4 +75,7 @@ export class Game {
 
   @OneToMany(() => Trailer, (trailer) => trailer.game)
   trailers: Trailer[];
+
+  @OneToMany(() => Screenshot, (screenshot) => screenshot.game)
+  screenshots: Screenshot[];
 }

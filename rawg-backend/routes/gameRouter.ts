@@ -5,6 +5,7 @@ import {
   deleteGameById,
   getGame,
   getGames,
+  getScreenshots,
   getTrailers,
 } from "../services/gameService";
 
@@ -82,6 +83,16 @@ gameRouter.get("/:id/movies", async (req, res) => {
     res.send({ count: trailers.length, results: trailers });
   } catch (error) {
     res.status(500).send({ error: "Failed to fetch trailers." });
+  }
+});
+
+gameRouter.get("/:id/screenshots", async (req, res) => {
+  try {
+    const gameId = Number(req.params.id);
+    const screenshotsData = await getScreenshots(gameId);
+    res.send(screenshotsData);
+  } catch (error) {
+    res.status(500).send({ error: "Failed to fetch screenshots." });
   }
 });
 
