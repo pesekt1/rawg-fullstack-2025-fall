@@ -180,6 +180,22 @@ export const getGame = async (gameId: string) => {
   }
 };
 
+export const getTrailers = async (gameId: number) => {
+  const game = await gameRepository
+    .createQueryBuilder("game")
+    .leftJoinAndSelect("game.trailers", "trailers")
+    .where("game.id = :gameId", { gameId })
+    .getOne();
+
+  if (!game || !game.trailers) {
+    throw new Error(`No trailers found for game with ID ${gameId}.`);
+  }
+  return {
+    count: game.trailers.length,
+    results: game.trailers,
+  };
+};
+
 export const deleteGameById = async (gameId: number) => {
   try {
     await gameRepository.delete(gameId);

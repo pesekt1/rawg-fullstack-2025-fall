@@ -3,12 +3,14 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Genre } from "./Genre";
 import { ParentPlatform } from "./ParentPlatform";
 import { Publisher } from "./Publisher";
 import { Store } from "./Store";
+import { Trailer } from "./Trailer";
 
 @Entity("games")
 export class Game {
@@ -69,4 +71,7 @@ export class Game {
     inverseJoinColumns: [{ name: "publishers_id", referencedColumnName: "id" }],
   })
   publishers: Publisher[];
+
+  @OneToMany(() => Trailer, (trailer) => trailer.game)
+  trailers: Trailer[];
 }

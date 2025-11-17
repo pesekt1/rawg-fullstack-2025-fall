@@ -1,7 +1,12 @@
 import { Router } from "express";
 import { Game } from "../entities/Game";
 import { ParentPlatform } from "../entities/ParentPlatform";
-import { deleteGameById, getGame, getGames } from "../services/gameService";
+import {
+  deleteGameById,
+  getGame,
+  getGames,
+  getTrailers,
+} from "../services/gameService";
 
 export type ModifiedGame = Omit<Game, "parent_platforms"> & {
   parent_platforms: { platform: ParentPlatform }[];
@@ -67,6 +72,16 @@ gameRouter.get("/:id", async (req, res) => {
     }
   } catch (error) {
     res.status(500).send({ error: "Failed to fetch the game." });
+  }
+});
+
+gameRouter.get("/:id/movies", async (req, res) => {
+  try {
+    const gameId = Number(req.params.id);
+    const trailers = await getTrailers(gameId);
+    res.send({ results: trailers });
+  } catch (error) {
+    res.status(500).send({ error: "Failed to fetch trailers." });
   }
 });
 
