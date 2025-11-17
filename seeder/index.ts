@@ -1,12 +1,14 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import * as fs from "fs";
+import { Repository } from "typeorm/repository/Repository";
 import { AppDataSource } from "./data-source";
 import { Game } from "./entities/Game";
 import { Genre } from "./entities/Genre";
 import { ParentPlatform } from "./entities/ParentPlatform";
 import { Publisher } from "./entities/Publisher";
 import { Store } from "./entities/Store";
+import { Trailer } from "./entities/Trailer";
 
 dotenv.config();
 
@@ -20,6 +22,24 @@ interface GameOriginal {
   genres: Genre[];
   stores: { store: Store }[];
   publishers: Publisher[];
+  trailers: Trailer[];
+}
+
+interface Response<T> {
+  count: number;
+  previous?: string;
+  next?: string;
+  results: T[];
+}
+
+interface TrailerOriginal {
+  id: number;
+  name: string;
+  preview: string;
+  data: {
+    "480": string;
+    max: string;
+  };
 }
 
 async function insertData() {
@@ -43,6 +63,7 @@ async function insertData() {
   const parentPlatformRepo = AppDataSource.getRepository(ParentPlatform);
   const storeRepo = AppDataSource.getRepository(Store);
   const publisherRepo = AppDataSource.getRepository(Publisher);
+  const trailerRepo = AppDataSource.getRepository(Trailer);
 
   //before inserting data, delete all existing data to avoid duplicates:
   await gameRepo.delete({});
@@ -55,6 +76,8 @@ async function insertData() {
   console.log("stores deleted");
   await publisherRepo.delete({});
   console.log("publishers deleted");
+  await trailerRepo.delete({});
+  console.log("trailers deleted");
 
   async function getAdditionalGameData(id: number) {
     const apiKey = process.env.RAWG_API_KEY;
@@ -73,6 +96,33 @@ async function insertData() {
     } catch (error) {
       console.error(`Failed to fetch description for game ID ${id}:`, error);
       return { description_raw: "", publishers: [] };
+    }
+  }
+
+  async function fetchTrailers(
+    gameId: number,
+    trailerRepo: Repository<Trailer>
+  ): Promise<Trailer[]> {
+    const apiKey = process.env.RAWG_API_KEY;
+    try {
+      const response = await axios.get<Response<TrailerOriginal>>(
+        `https://api.rawg.io/api/games/${gameId}/movies?key=${apiKey}`
+      );
+
+      const trailers = response.data.results || [];
+      return trailers.map((trailerData) =>
+        trailerRepo.create({
+          id: trailerData.id,
+          name: trailerData.name,
+          preview: trailerData.preview,
+          data480: trailerData.data["480"],
+          dataMax: trailerData.data["max"],
+          game: { id: gameId } as Game,
+        })
+      );
+    } catch (error) {
+      console.error(`Failed to fetch trailers for game ID ${gameId}:`, error);
+      return [];
     }
   }
 
@@ -150,8 +200,17 @@ async function insertData() {
     );
 
     // Now save the game itself - it will also save the relationships in the join tables
-    await gameRepo.save(game);
+    const savedGame = await gameRepo.save(game);
     console.log(`Game: ${game.name} created`);
+
+    // Fetch and save trailers for the game
+    const trailers = await fetchTrailers(game.id, trailerRepo);
+
+    trailers.forEach((trailer) => {
+      trailer.game = savedGame;
+    });
+    await trailerRepo.save(trailers);
+    console.log(`Trailers for game: ${game.name} created`);
   }
 }
 
