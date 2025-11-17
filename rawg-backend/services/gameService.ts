@@ -190,10 +190,7 @@ export const getTrailers = async (gameId: number) => {
   if (!game || !game.trailers) {
     throw new Error(`No trailers found for game with ID ${gameId}.`);
   }
-  return {
-    count: game.trailers.length,
-    results: game.trailers,
-  };
+  return game.trailers;
 };
 
 export const deleteGameById = async (gameId: number) => {

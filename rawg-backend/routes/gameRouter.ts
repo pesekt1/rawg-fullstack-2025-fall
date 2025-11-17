@@ -79,7 +79,7 @@ gameRouter.get("/:id/movies", async (req, res) => {
   try {
     const gameId = Number(req.params.id);
     const trailers = await getTrailers(gameId);
-    res.send({ results: trailers });
+    res.send({ count: trailers.length, results: trailers });
   } catch (error) {
     res.status(500).send({ error: "Failed to fetch trailers." });
   }
