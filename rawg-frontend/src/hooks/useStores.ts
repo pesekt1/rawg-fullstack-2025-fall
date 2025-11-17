@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import ms from "ms";
 
 import stores from "../data/stores";
-import type { Store } from "../entities/Store";
+import type Store from "../entities/Store";
 import { type Response } from "../services/api-client";
 import storeService from "../services/storeService";
 

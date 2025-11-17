@@ -1,9 +1,9 @@
-import type { Genre } from "./Genre";
-import type { Platform } from "./Platform";
-import type { Publisher } from "./Publisher";
-import type { Store } from "./Store";
+import type Genre from "./Genre";
+import type Platform from "./Platform";
+import type Publisher from "./Publisher";
+import type Store from "./Store";
 
-export interface Game {
+export default interface Game {
   id: number;
   name: string;
   background_image: string;

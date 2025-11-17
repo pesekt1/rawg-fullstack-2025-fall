@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import ms from "ms";
 
 import genres from "../data/genres";
-import type { Genre } from "../entities/Genre";
+import type Genre from "../entities/Genre";
 import { type Response } from "../services/api-client";
 import genreService from "../services/genreService";
 

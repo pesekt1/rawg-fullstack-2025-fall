@@ -13,7 +13,7 @@ import { SiNintendo } from "react-icons/si";
 
 import { HStack, Icon } from "@chakra-ui/react";
 
-import type { Platform } from "../entities/Platform";
+import type Platform from "../entities/Platform";
 
 interface Props {
   platforms: Platform[];
