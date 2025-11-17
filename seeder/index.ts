@@ -7,23 +7,17 @@ import { Game } from "./entities/Game";
 import { Genre } from "./entities/Genre";
 import { ParentPlatform } from "./entities/ParentPlatform";
 import { Publisher } from "./entities/Publisher";
+import { Screenshot } from "./entities/Screenshot";
 import { Store } from "./entities/Store";
 import { Trailer } from "./entities/Trailer";
 
 dotenv.config();
 
 // Define the structure of the original game data as it appears in games.json
-interface GameOriginal {
-  id: number;
-  name: string;
-  background_image?: string;
-  metacritic?: number;
+type GameOriginal = Omit<Game, "parent_platforms" | "stores"> & {
   parent_platforms: { platform: ParentPlatform }[];
-  genres: Genre[];
   stores: { store: Store }[];
-  publishers: Publisher[];
-  trailers: Trailer[];
-}
+};
 
 interface Response<T> {
   count: number;
@@ -64,6 +58,7 @@ async function insertData() {
   const storeRepo = AppDataSource.getRepository(Store);
   const publisherRepo = AppDataSource.getRepository(Publisher);
   const trailerRepo = AppDataSource.getRepository(Trailer);
+  const screenshotRepo = AppDataSource.getRepository(Screenshot);
 
   //before inserting data, delete all existing data to avoid duplicates:
   await gameRepo.delete({});
@@ -78,6 +73,8 @@ async function insertData() {
   console.log("publishers deleted");
   await trailerRepo.delete({});
   console.log("trailers deleted");
+  await screenshotRepo.delete({});
+  console.log("screenshots deleted");
 
   async function getAdditionalGameData(id: number) {
     const apiKey = process.env.RAWG_API_KEY;
@@ -122,6 +119,35 @@ async function insertData() {
       );
     } catch (error) {
       console.error(`Failed to fetch trailers for game ID ${gameId}:`, error);
+      return [];
+    }
+  }
+
+  async function fetchScreenshots(
+    gameId: number,
+    screenshotRepo: Repository<Screenshot>
+  ): Promise<Screenshot[]> {
+    const apiKey = process.env.RAWG_API_KEY;
+    try {
+      const response = await axios.get<Response<Screenshot>>(
+        `https://api.rawg.io/api/games/${gameId}/screenshots?key=${apiKey}`
+      );
+      const screenshots = response.data.results || [];
+      return screenshots.map((screenshotData) =>
+        screenshotRepo.create({
+          id: screenshotData.id,
+          image: screenshotData.image,
+          width: screenshotData.width,
+          height: screenshotData.height,
+          is_deleted: screenshotData.is_deleted,
+          game: { id: gameId } as Game,
+        })
+      );
+    } catch (error) {
+      console.error(
+        `Failed to fetch screenshots for game ID ${gameId}:`,
+        error
+      );
       return [];
     }
   }
@@ -211,6 +237,14 @@ async function insertData() {
     });
     await trailerRepo.save(trailers);
     console.log(`Trailers for game: ${game.name} created`);
+
+    // Fetch and save screenshots for the game
+    const screenshots = await fetchScreenshots(game.id, screenshotRepo);
+    screenshots.forEach((screenshot) => {
+      screenshot.game = savedGame;
+    });
+    await screenshotRepo.save(screenshots);
+    console.log(`Screenshots for game: ${game.name} created`);
   }
 }
 
