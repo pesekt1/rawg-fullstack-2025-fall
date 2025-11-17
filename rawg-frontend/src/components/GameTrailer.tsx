@@ -15,7 +15,7 @@ const GameTrailer = ({ gameId }: Props) => {
 
   const firstTrailer = data?.results[0];
 
-  if (!firstTrailer) null;
+  if (!firstTrailer) return null;
 
   return (
     <video
