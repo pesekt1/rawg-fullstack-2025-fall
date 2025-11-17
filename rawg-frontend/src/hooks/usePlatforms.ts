@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import ms from "ms";
 
 import platforms from "../data/platforms";
+import type { Platform } from "../entities/Platform";
 import { type Response } from "../services/api-client";
-import type { Platform } from "../services/platformService";
 import platformService from "../services/platformService";
 
 const usePlatforms = () =>

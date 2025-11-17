@@ -9,8 +9,8 @@ import {
   Image,
 } from "@chakra-ui/react";
 
+import type { Game } from "../entities/Game";
 import useDeleteGame from "../hooks/useDeleteGame";
-import type { Game } from "../services/gameService";
 import getCroppedImageUrl from "../services/image-url";
 import CriticScore from "./CriticScore";
 import PlatformIconsList from "./PlatformIconsList";

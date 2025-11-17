@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import ms from "ms";
 
 import stores from "../data/stores";
+import type { Store } from "../entities/Store";
 import { type Response } from "../services/api-client";
-import type { Store } from "../services/storeService";
 import storeService from "../services/storeService";
 
 const useStores = () =>

@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-import type { Genre } from "./services/genreService";
-import type { Platform } from "./services/platformService";
-import type { Store } from "./services/storeService";
+import type { Genre } from "./entities/Genre";
+import type { Platform } from "./entities/Platform";
+import type { Store } from "./entities/Store";
 
 export interface GameQuery {
   genre?: Genre;
